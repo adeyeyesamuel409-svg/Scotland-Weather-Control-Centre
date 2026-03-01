@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Scotland 3D Weather Control Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+
+    <style>
+        :root {
+            --bg: #050816;
+            --bg-alt: #0b1020;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.2);
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --card: #020617;
+            --border: rgba(148, 163, 184, 0.2);
+            --danger: #f97373;
+            --success: #4ade80;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 1280px;
+            min-height: 720px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%),
+                        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.08), transparent 55%),
+                        #020617;
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow:
+                0 0 0 1px rgba(15, 23, 42, 0.9),
+                0 40px 120px rgba(15, 23, 42, 0.9),
+                0 0 80px rgba(56, 189, 248, 0.25);
+            padding: 20px 22px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+            gap: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-shell::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(129, 140, 248, 0.2), rgba(56, 189, 248, 0.6));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .app-shell::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px, rgba(148, 163, 184, 0.12) 1px, transparent 0);
+            background-size: 22px 22px;
+            opacity: 0.25;
+            mix-blend-mode: soft-light;
+            pointer-events: none;
+        }
+
+        .app-shell > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .left-column,
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .title-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #e0f2fe;
+        }
+
+        .title-pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, #facc15, #f97316);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+        }
+
+        .title-main {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .title-sub {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-label {
+            position: absolute;
+            top: -9px;
+            left: 10px;
+            padding: 0 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+            border-radius: 999px;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            padding: 10px 32px 9px 12px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            min-width: 180px;
+            cursor: pointer;
+        }
+
+        .select-chevron {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .refresh-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.98));
+            color: #e0f2fe;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+        }
+
+        .refresh-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+        }
+
+        .refresh-icon {
+            font-size: 12px;
+        }
+
+        .scotland-card {
+            position: relative;
+            flex: 1;
+            border-radius: 20px;
+            padding: 16px 16px 14px;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.22), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.18), transparent 55%),
+                linear-gradient(145deg, #020617, #020617);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.9),
+                0 0 40px rgba(56, 189, 248, 0.35);
+            overflow: hidden;
+        }
+
+        .scotland-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.25), transparent 55%);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .scotland-card-inner {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .scotland-visual {
+            position: relative;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scotland-orbit {
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            border-radius: 999px;
+            border: 1px dashed rgba(148, 163, 184, 0.4);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.35);
+            animation: orbitGlow 12s linear infinite;
+        }
+
+        .scotland-orbit::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border-radius: inherit;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            opacity: 0.7;
+        }
+
+        .scotland-orbit::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: conic-gradient(
+                from 220deg,
+                rgba(56, 189, 248, 0.0),
+                rgba(56, 189, 248, 0.7),
+                rgba(129, 140, 248, 0.0),
+                rgba(56, 189, 248, 0.0)
+            );
+            mix-blend-mode: screen;
+            opacity: 0.7;
+        }
+
+        .scotland-3d {
+            position: relative;
+            width: 150px;
+            height: 190px;
+            border-radius: 999px;
+            background:
+                radial-gradient(circle at 30% 0%, rgba(248, 250, 252, 0.9), rgba(148, 163, 184, 0.4)),
+                radial-gradient(circle at 70% 100%, rgba(56, 189, 248, 0.9), rgba(15, 23, 42, 1));
+            box-shadow:
+                0 25px 60px rgba(15, 23, 42, 0.95),
+                0 0 40px rgba(56, 189, 248, 0.55);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: rotateX(18deg) rotateY(-22deg);
+            animation: float3D 9s ease-in-out infinite;
+        }
+
+        .scotland-3d::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 30% 20%, rgba(15, 23, 42, 0.0) 0, rgba(15, 23, 42, 0.0) 40%, rgba(15, 23, 42, 0.9) 100%),
+                radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.35) 0, rgba(56, 189, 248, 0.0) 55%),
+                radial-gradient(circle at 50% 60%, rgba(56, 189, 248, 0.35) 0, rgba(56, 189, 248, 0.0) 55%);
+            mix-blend-mode: soft-light;
+            opacity: 0.9;
+        }
+
+        .scotland-3d::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 50% 25%, rgba(15, 23, 42, 0.0) 0, rgba(15, 23, 42, 0.0) 40%, rgba(15, 23, 42, 0.95) 100%),
+                radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.35) 0, rgba(56, 189, 248, 0.0) 55%),
+                radial-gradient(circle at 50% 60%, rgba(56, 189, 248, 0.35) 0, rgba(56, 189, 248, 0.0) 55%);
+            mix-blend-mode: soft-light;
+            opacity: 0.9;
+        }
+
+        .scotland-label {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .scotland-glow {
+            position: absolute;
+            inset: auto 0 -18px;
+            height: 40px;
+            background: radial-gradient(circle at 50% 0, rgba(56, 189, 248, 0.7), transparent 60%);
+            opacity: 0.7;
+            filter: blur(10px);
+        }
+
+        .scotland-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .metric-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .metric-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-location {
+            font-size: 13px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        .metric-temp-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .metric-temp {
+            font-size: 40px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .metric-temp span {
+            font-size: 18px;
+            color: #9ca3af;
+        }
+
+        .metric-desc {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        .metric-sub {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .metric-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .metric-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+
+        .metric-badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+        }
+
+        .metric-badge-dot.red {
+            background: radial-gradient(circle at 30% 30%, #f97373, #ef4444);
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.9);
+        }
+
+        .metric-badge-dot.blue {
+            background: radial-gradient(circle at 30% 30%, #38bdf8, #0ea5e9);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+        }
+
+        .metric-badge-label {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        .metric-badge-value {
+            font-weight: 500;
+        }
+
+        .metric-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .metric-side-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #9ca3af;
+        }
+
+        .metric-side-value {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        .metric-side-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            width: 100%;
+        }
+
+        .metric-side-chip {
+            padding: 6px 8px;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .metric-side-chip-label {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #9ca3af;
+        }
+
+        .metric-side-chip-value {
+            color: #e5e7eb;
+        }
+
+        .map-card {
+            position: relative;
+            flex: 1;
+            border-radius: 18px;
+            padding: 10px;
+            background:
+                radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 55%),
+                radial-gradient(circle at bottom left, rgba(129, 140, 248, 0.18), transparent 55%),
+                #020617;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            box-shadow:
+                0 18px 45px rgba(15, 23, 42, 0.9),
+                0 0 40px rgba(56, 189, 248, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .map-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .map-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #9ca3af;
+        }
+
+        .map-subtitle {
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+
+        .map-legend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        .map-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+        }
+
+        .map-legend-dot.blue {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+        }
+
+        .map-legend-dot.red {
+            background: linear-gradient(135deg, #f97373, #ef4444);
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.9);
+        }
+
+        #map {
+            flex: 1;
+            min-height: 260px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+        }
+
+        .leaflet-control-layers {
+            background: rgba(15, 23, 42, 0.95) !important;
+            color: #e5e7eb !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(148, 163, 184, 0.6) !important;
+        }
+
+        .leaflet-control-layers-expanded {
+            padding: 6px 8px !important;
+        }
+
+        .leaflet-control-layers-base label {
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+
+        .forecast-card {
+            border-radius: 16px;
+            padding: 10px;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 55%),
+                #020617;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .forecast-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .forecast-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #9ca3af;
+        }
+
+        .forecast-subtitle {
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .forecast-item {
+            border-radius: 12px;
+            padding: 8px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .forecast-day {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #9ca3af;
+        }
+
+        .forecast-temp {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        .forecast-desc {
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        .atmos-card {
+            border-radius: 16px;
+            padding: 10px;
+            background:
+                radial-gradient(circle at top right, rgba(129, 140, 248, 0.18), transparent 55%),
+                #020617;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .atmos-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .atmos-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #9ca3af;
+        }
+
+        .atmos-subtitle {
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+
+        .atmos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .atmos-item {
+            border-radius: 12px;
+            padding: 8px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11px;
+        }
+
+        .atmos-label {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #9ca3af;
+        }
+
+        .atmos-value {
+            color: #e5e7eb;
+        }
+
+        .atmos-extra {
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        .built-by {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #e5e7eb;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            z-index: 999;
+        }
+
+        @keyframes float3D {
+            0% {
+                transform: rotateX(18deg) rotateY(-22deg) translateY(0);
+            }
+            50% {
+                transform: rotateX(18deg) rotateY(-22deg) translateY(-10px);
+            }
+            100% {
+                transform: rotateX(18deg) rotateY(-22deg) translateY(0);
+            }
+        }
+
+        @keyframes orbitGlow {
+            0% {
+                transform: rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(360deg);
+                opacity: 0.7;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            body {
+                padding: 12px;
+            }
+
+            .app-shell {
+                grid-template-columns: minmax(0, 1fr);
+                min-height: auto;
+            }
+
+            .scotland-card-inner {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .scotland-visual {
+                order: -1;
+            }
+
+            .forecast-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .atmos-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .built-by {
+                position: static;
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .forecast-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .atmos-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <div class="left-column">
+            <div class="header-row">
+                <div class="title-block">
+                    <div class="title-pill">
+                        <div class="title-pill-dot"></div>
+                        <span>Scotland Weather Control Center</span>
+                    </div>
+                    <div class="title-main">Live Atmospheric Operations</div>
+                    <div class="title-sub">Real-time weather intelligence for key Scottish cities • Powered by OpenWeather & AWS CloudFront</div>
+                </div>
+                <div class="controls-row">
+                    <div class="select-wrapper">
+                        <div class="select-label">City</div>
+                        <select id="city-select">
+                            <option value="Edinburgh" selected>Edinburgh</option>
+                            <option value="Glasgow">Glasgow</option>
+                            <option value="Aberdeen">Aberdeen</option>
+                            <option value="Dundee">Dundee</option>
+                            <option value="Inverness">Inverness</option>
+                            <option value="Stirling">Stirling</option>
+                            <option value="Perth">Perth</option>
+                            <option value="Falkirk">Falkirk</option>
+                            <option value="Paisley">Paisley</option>
+                            <option value="St Andrews">St Andrews</option>
+                        </select>
+                        <div class="select-chevron">▾</div>
+                    </div>
+                    <button class="refresh-button" id="refresh-btn">
+                        <span class="refresh-dot"></span>
+                        <span class="refresh-icon">⟳</span>
+                        <span>Sync Now</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="scotland-card">
+                <div class="scotland-card-inner">
+                    <div class="scotland-visual">
+                        <div class="scotland-orbit"></div>
+                        <div class="scotland-3d">
+                            <div class="scotland-label">Scotland • 3D Weather Core</div>
+                            <div class="scotland-glow"></div>
+                        </div>
+                    </div>
+                    <div class="scotland-metrics">
+                        <div class="metric-row">
+                            <div class="metric-main">
+                                <div class="metric-location" id="location-label">Edinburgh, Scotland</div>
+                                <div class="metric-temp-row">
+                                    <div class="metric-temp" id="temperature">--<span>°C</span></div>
+                                </div>
+                                <div class="metric-desc" id="weather-description">Awaiting live data…</div>
+                                <div class="metric-sub" id="weather-extra">Feels like --°C • Wind -- m/s • Humidity --%</div>
+                            </div>
+                            <div class="metric-side">
+                                <div class="metric-side-label">Local Time</div>
+                                <div class="metric-side-value" id="local-time">--:--</div>
+                                <div class="metric-side-grid">
+                                    <div class="metric-side-chip">
+                                        <div class="metric-side-chip-label">Sunrise</div>
+                                        <div class="metric-side-chip-value" id="sunrise">--:--</div>
+                                    </div>
+                                    <div class="metric-side-chip">
+                                        <div class="metric-side-chip-label">Sunset</div>
+                                        <div class="metric-side-chip-value" id="sunset">--:--</div>
+                                    </div>
+                                    <div class="metric-side-chip">
+                                        <div class="metric-side-chip-label">Visibility</div>
+                                        <div class="metric-side-chip-value" id="visibility">-- km</div>
+                                    </div>
+                                    <div class="metric-side-chip">
+                                        <div class="metric-side-chip-label">Cloud Cover</div>
+                                        <div class="metric-side-chip-value" id="cloud-cover">--%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric-badges">
+                            <div class="metric-badge">
+                                <div class="metric-badge-dot blue"></div>
+                                <div>
+                                    <div class="metric-badge-label">Pressure</div>
+                                    <div class="metric-badge-value" id="pressure">-- hPa</div>
+                                </div>
+                            </div>
+                            <div class="metric-badge">
+                                <div class="metric-badge-dot"></div>
+                                <div>
+                                    <div class="metric-badge-label">Wind</div>
+                                    <div class="metric-badge-value" id="wind">-- m/s</div>
+                                </div>
+                            </div>
+                            <div class="metric-badge">
+                                <div class="metric-badge-dot red"></div>
+                                <div>
+                                    <div class="metric-badge-label">Humidity</div>
+                                    <div class="metric-badge-value" id="humidity">--%</div>
+                                </div>
+                            </div>
+                            <div class="metric-badge">
+                                <div class="metric-badge-dot blue"></div>
+                                <div>
+                                    <div class="metric-badge-label">Conditions</div>
+                                    <div class="metric-badge-value" id="conditions-label">Initializing radar stack…</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="map-card">
+                <div class="map-header">
+                    <div>
+                        <div class="map-title">Live Radar Stack</div>
+                        <div class="map-subtitle">Precipitation, clouds, wind & temperature layers • OpenWeather tiles</div>
+                    </div>
+                    <div class="map-legend">
+                        <div class="map-legend-dot blue"></div>
+                        <span>Rain</span>
+                        <div class="map-legend-dot"></div>
+                        <span>Clouds</span>
+                        <div class="map-legend-dot red"></div>
+                        <span>Wind / Temp</span>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <div class="forecast-card">
+                <div class="forecast-header">
+                    <div>
+                        <div class="forecast-title">5-Day Outlook</div>
+                        <div class="forecast-subtitle">Condensed forecast at 12:00 local time • Updated with each sync</div>
+                    </div>
+                </div>
+                <div class="forecast-grid" id="forecast-grid">
+                    <!-- Forecast items injected by JS -->
+                </div>
+            </div>
+
+            <div class="atmos-card">
+                <div class="atmos-header">
+                    <div>
+                        <div class="atmos-title">Atmospheric Profile</div>
+                        <div class="atmos-subtitle">Key metrics for operational awareness</div>
+                    </div>
+                </div>
+                <div class="atmos-grid">
+                    <div class="atmos-item">
+                        <div class="atmos-label">Dew Point</div>
+                        <div class="atmos-value" id="dew-point">--°C</div>
+                        <div class="atmos-extra">Approximation based on temp & humidity</div>
+                    </div>
+                    <div class="atmos-item">
+                        <div class="atmos-label">Sea Level Pressure</div>
+                        <div class="atmos-value" id="sea-level-pressure">-- hPa</div>
+                        <div class="atmos-extra">Standardized to mean sea level</div>
+                    </div>
+                    <div class="atmos-item">
+                        <div class="atmos-label">Ground Level</div>
+                        <div class="atmos-value" id="ground-level-pressure">-- hPa</div>
+                        <div class="atmos-extra">Approximate surface pressure</div>
+                    </div>
+                    <div class="atmos-item">
+                        <div class="atmos-label">Cloud Base</div>
+                        <div class="atmos-value" id="cloud-base">-- m</div>
+                        <div class="atmos-extra">Estimated from humidity & temp</div>
+                    </div>
+                    <div class="atmos-item">
+                        <div class="atmos-label">Conditions Tag</div>
+                        <div class="atmos-value" id="conditions-tag">--</div>
+                        <div class="atmos-extra">Human-readable operational label</div>
+                    </div>
+                    <div class="atmos-item">
+                        <div class="atmos-label">Update Status</div>
+                        <div class="atmos-value" id="update-status">Awaiting first sync…</div>
+                        <div class="atmos-extra">Reflects last successful API call</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="built-by">
+            Built by Samuel • 2026
+        </div>
+    </div>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <script>
+        const API_KEY = "33ced6a4eb0fdc5612a9964507e843d8";
+        const TILE_API_KEY = "33ced6a4eb0fdc5612a9964507e843d8";
+
+        const cityCoords = {
+            "Edinburgh": { lat: 55.9533, lon: -3.1883 },
+            "Glasgow": { lat: 55.8642, lon: -4.2518 },
+            "Aberdeen": { lat: 57.1497, lon: -2.0943 },
+            "Dundee": { lat: 56.4620, lon: -2.9707 },
+            "Inverness": { lat: 57.4778, lon: -4.2247 },
+            "Stirling": { lat: 56.1165, lon: -3.9369 },
+            "Perth": { lat: 56.3969, lon: -3.4370 },
+            "Falkirk": { lat: 56.0019, lon: -3.7839 },
+            "Paisley": { lat: 55.8467, lon: -4.4236 },
+            "St Andrews": { lat: 56.3398, lon: -2.7967 }
+        };
+
+        const map = L.map("map", {
+            zoomControl: false
+        }).setView([55.9533, -3.1883], 7);
+
+        L.control.zoom({ position: "bottomright" }).addTo(map);
+
+        const precipLayer = L.tileLayer(
+            `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${TILE_API_KEY}`,
+            { opacity: 0.6 }
+        ).addTo(map);
+
+        const cloudsLayer = L.tileLayer(
+            `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${TILE_API_KEY}`,
+            { opacity: 0.6 }
+        );
+
+        const windLayer = L.tileLayer(
+            `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${TILE_API_KEY}`,
+            { opacity: 0.6 }
+        );
+
+        const tempLayer = L.tileLayer(
+            `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${TILE_API_KEY}`,
+            { opacity: 0.6 }
+        );
+
+        const baseLayers = {
+            "Rain": precipLayer,
+            "Clouds": cloudsLayer,
+            "Wind": windLayer,
+            "Temperature": tempLayer
+        };
+
+        L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
+
+        const citySelect = document.getElementById("city-select");
+        const refreshBtn = document.getElementById("refresh-btn");
+
+        const locationLabel = document.getElementById("location-label");
+        const temperatureEl = document.getElementById("temperature");
+        const weatherDescriptionEl = document.getElementById("weather-description");
+        const weatherExtraEl = document.getElementById("weather-extra");
+        const localTimeEl = document.getElementById("local-time");
+        const sunriseEl = document.getElementById("sunrise");
+        const sunsetEl = document.getElementById("sunset");
+        const visibilityEl = document.getElementById("visibility");
+        const cloudCoverEl = document.getElementById("cloud-cover");
+        const pressureEl = document.getElementById("pressure");
+        const windEl = document.getElementById("wind");
+        const humidityEl = document.getElementById("humidity");
+        const conditionsLabelEl = document.getElementById("conditions-label");
+
+        const dewPointEl = document.getElementById("dew-point");
+        const seaLevelPressureEl = document.getElementById("sea-level-pressure");
+        const groundLevelPressureEl = document.getElementById("ground-level-pressure");
+        const cloudBaseEl = document.getElementById("cloud-base");
+        const conditionsTagEl = document.getElementById("conditions-tag");
+        const updateStatusEl = document.getElementById("update-status");
+
+        const forecastGrid = document.getElementById("forecast-grid");
+
+        function formatTimeFromUnix(unix, timezoneOffset) {
+            const date = new Date((unix + timezoneOffset) * 1000);
+            return date.toUTCString().match(/\d{2}:\d{2}/)[0];
+        }
+
+        function formatLocalTime(timezoneOffset) {
+            const now = new Date();
+            const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+            const local = new Date(utc + timezoneOffset * 1000);
+            return local.toTimeString().slice(0, 5);
+        }
+
+        function estimateDewPoint(tempC, humidity) {
+            if (tempC == null || humidity == null) return null;
+            const a = 17.27;
+            const b = 237.7;
+            const alpha = ((a * tempC) / (b + tempC)) + Math.log(humidity / 100);
+            const dewPoint = (b * alpha) / (a - alpha);
+            return Math.round(dewPoint * 10) / 10;
+        }
+
+        function estimateCloudBase(tempC, dewPointC) {
+            if (tempC == null || dewPointC == null) return null;
+            const spread = tempC - dewPointC;
+            const baseFeet = spread * 400;
+            const baseMeters = baseFeet * 0.3048;
+            return Math.round(baseMeters);
+        }
+
+        function classifyConditions(main, description, windSpeed, visibility, cloudCover) {
+            const mainLower = (main || "").toLowerCase();
+            const descLower = (description || "").toLowerCase();
+
+            if (mainLower.includes("thunderstorm")) return "Thunderstorm Risk";
+            if (mainLower.includes("snow")) return "Snow / Wintry Conditions";
+            if (mainLower.includes("rain") || mainLower.includes("drizzle")) {
+                if (windSpeed > 10) return "Heavy Rain & Gusty Winds";
+                return "Rain / Showers Active";
+            }
+            if (mainLower.includes("clear")) {
+                if (visibility > 9000) return "Clear & Excellent Visibility";
+                return "Clear Skies";
+            }
+            if (mainLower.includes("clouds")) {
+                if (cloudCover > 80) return "Overcast / Low Cloud Ceiling";
+                if (cloudCover > 50) return "Broken Cloud Cover";
+                return "Scattered Clouds";
+            }
+            if (descLower.includes("mist") || descLower.includes("fog") || visibility < 3000) {
+                return "Reduced Visibility / Mist or Fog";
+            }
+            return "Standard Conditions";
+        }
+
+        async function fetchWeather(city) {
+            const coords = cityCoords[city];
+            if (!coords) return;
+
+            const { lat, lon } = coords;
+
+            const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+
+            try {
+                updateStatusEl.textContent = "Syncing with OpenWeather…";
+
+                const [currentRes, forecastRes] = await Promise.all([
+                    fetch(currentUrl),
+                    fetch(forecastUrl)
+                ]);
+
+                if (!currentRes.ok || !forecastRes.ok) {
+                    throw new Error("API response not OK");
+                }
+
+                const currentData = await currentRes.json();
+                const forecastData = await forecastRes.json();
+
+                const temp = currentData.main?.temp ?? null;
+                const feelsLike = currentData.main?.feels_like ?? null;
+                const humidity = currentData.main?.humidity ?? null;
+                const pressure = currentData.main?.pressure ?? null;
+                const seaLevel = currentData.main?.sea_level ?? pressure ?? null;
+                const groundLevel = currentData.main?.grnd_level ?? pressure ?? null;
+                const visibility = currentData.visibility ?? null;
+                const windSpeed = currentData.wind?.speed ?? null;
+                const windDeg = currentData.wind?.deg ?? null;
+                const clouds = currentData.clouds?.all ?? null;
+                const main = currentData.weather?.[0]?.main ?? "";
+                const description = currentData.weather?.[0]?.description ?? "";
+                const sunrise = currentData.sys?.sunrise ?? null;
+                const sunset = currentData.sys?.sunset ?? null;
+                const timezoneOffset = currentData.timezone ?? 0;
+
+                locationLabel.textContent = `${currentData.name || city}, Scotland`;
+                if (temp != null) {
+                    temperatureEl.innerHTML = `${Math.round(temp)}<span>°C</span>`;
+                } else {
+                    temperatureEl.innerHTML = `--<span>°C</span>`;
+                }
+
+                weatherDescriptionEl.textContent = description ? description.charAt(0).toUpperCase() + description.slice(1) : "No description";
+
+                const feelsLikeText = feelsLike != null ? `${Math.round(feelsLike)}°C` : "--°C";
+                const windText = windSpeed != null ? `${windSpeed.toFixed(1)} m/s` : "-- m/s";
+                const humidityText = humidity != null ? `${humidity}%` : "--%";
+
+                weatherExtraEl.textContent = `Feels like ${feelsLikeText} • Wind ${windText} • Humidity ${humidityText}`;
+
+                localTimeEl.textContent = formatLocalTime(timezoneOffset);
+
+                if (sunrise != null) sunriseEl.textContent = formatTimeFromUnix(sunrise, timezoneOffset);
+                if (sunset != null) sunsetEl.textContent = formatTimeFromUnix(sunset, timezoneOffset);
+
+                if (visibility != null) {
+                    visibilityEl.textContent = `${Math.round(visibility / 1000)} km`;
+                } else {
+                    visibilityEl.textContent = "-- km";
+                }
+
+                if (clouds != null) {
+                    cloudCoverEl.textContent = `${clouds}%`;
+                } else {
+                    cloudCoverEl.textContent = "--%";
+                }
+
+                if (pressure != null) pressureEl.textContent = `${pressure} hPa`;
+                if (windSpeed != null) windEl.textContent = `${windSpeed.toFixed(1)} m/s`;
+                if (humidity != null) humidityEl.textContent = `${humidity}%`;
+
+                const dewPoint = estimateDewPoint(temp, humidity);
+                if (dewPoint != null) {
+                    dewPointEl.textContent = `${dewPoint}°C`;
+                } else {
+                    dewPointEl.textContent = "--°C";
+                }
+
+                if (seaLevel != null) seaLevelPressureEl.textContent = `${seaLevel} hPa`;
+                if (groundLevel != null) groundLevelPressureEl.textContent = `${groundLevel} hPa`;
+
+                const cloudBase = estimateCloudBase(temp, dewPoint);
+                if (cloudBase != null) {
+                    cloudBaseEl.textContent = `${cloudBase} m`;
+                } else {
+                    cloudBaseEl.textContent = "-- m";
+                }
+
+                const conditionsTag = classifyConditions(main, description, windSpeed || 0, visibility || 10000, clouds || 0);
+                conditionsTagEl.textContent = conditionsTag;
+                conditionsLabelEl.textContent = conditionsTag;
+
+                const now = new Date();
+                updateStatusEl.textContent = `Last updated at ${now.toTimeString().slice(0, 5)} local`;
+
+                renderForecast(forecastData, timezoneOffset);
+
+                map.setView([lat, lon], 7);
+            } catch (error) {
+                console.error("Error fetching weather:", error);
+                updateStatusEl.textContent = "Error syncing with OpenWeather. Please try again.";
+                conditionsLabelEl.textContent = "API error / check network or key";
+            }
+        }
+
+        function renderForecast(forecastData, timezoneOffset) {
+            forecastGrid.innerHTML = "";
+
+            if (!forecastData || !forecastData.list) {
+                return;
+            }
+
+            const daily = {};
+
+            forecastData.list.forEach(item => {
+                const date = new Date((item.dt + timezoneOffset) * 1000);
+                const dayKey = date.toISOString().slice(0, 10);
+                const hour = date.getUTCHours();
+
+                if (!daily[dayKey]) {
+                    daily[dayKey] = [];
+                }
+                daily[dayKey].push({ hour, item });
+            });
+
+            const days = Object.keys(daily).slice(0, 5);
+
+            days.forEach(dayKey => {
+                const entries = daily[dayKey];
+                let target = entries.find(e => e.hour === 12);
+                if (!target) {
+                    target = entries[Math.floor(entries.length / 2)];
+                }
+
+                const item = target.item;
+                const date = new Date((item.dt + timezoneOffset) * 1000);
+                const dayName = date.toLocaleDateString("en-GB", { weekday: "short" });
+
+                const temp = item.main?.temp ?? null;
+                const desc = item.weather?.[0]?.description ?? "";
+                const main = item.weather?.[0]?.main ?? "";
+
+                const card = document.createElement("div");
+                card.className = "forecast-item";
+
+                const tempText = temp != null ? `${Math.round(temp)}°C` : "--°C";
+
+                card.innerHTML = `
+                    <div class="forecast-day">${dayName}</div>
+                    <div class="forecast-temp">${tempText}</div>
+                    <div class="forecast-desc">${main}</div>
+                    <div class="forecast-desc">${desc}</div>
+                `;
+
+                forecastGrid.appendChild(card);
+            });
+        }
+
+        citySelect.addEventListener("change", () => {
+            const city = citySelect.value;
+            fetchWeather(city);
+        });
+
+        refreshBtn.addEventListener("click", () => {
+            const city = citySelect.value;
+            fetchWeather(city);
+        });
+
+        fetchWeather("Edinburgh");
+    </script>
+</body>
+</html>
