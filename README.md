@@ -82,7 +82,7 @@ The project is hosted on AWS S3 and distributed globally through CloudFront. Cac
 
 🛠️ Setup Instructions
 1. Clone the repository
-git clone https://github.com/adeyeyesamue409-svg/scotland-weather-control-center.git
+git clone https://github.com/adeyeyesamuel409-svg/scotland-weather-control-center.git
 cd scotland-weather-control-center
 
 
