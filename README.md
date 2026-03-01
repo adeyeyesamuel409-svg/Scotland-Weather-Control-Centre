@@ -109,8 +109,7 @@ Your dashboard is now live.
 ![Scotland Weather Dashboard Screenshot 2](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/Screenshot%202026-03-01%20015031.png?raw=true)
 
 ![Scotland Weather Dashboard Screenshot 3](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/Screenshot%202026-03-01%20015500.png?raw=true)
-- City Selector
-- Forecast + Atmospheric Profile
+![Scotland Weather Dashboard Screenshot 4](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/Screenshot%202026-03-01%20015228.png?raw=true)
 - Built by Samuel badge
 
 
