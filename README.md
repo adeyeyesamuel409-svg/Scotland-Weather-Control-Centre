@@ -157,8 +157,9 @@ Your dashboard is now live.
 
 📸 Screenshot
 
-![Scotland Weather Dashboard Screenshot]
+## 📸 Screenshot
 
+![Scotland Weather Dashboard Screenshot]adeyeyesamuel409-svg_Scotland-Weather-Control-Centre_ 3D live weather dashboard using OpenWeather API, Leaflet, AWS S3 + and 10 more pages - Personal - Microsoft​ Edge 3_3_2026 9_06_35 PM.png)
 
 
 
