@@ -78,20 +78,29 @@ Branding
 “Built by Samuel • 2026” signature badge
 
 🧠 Technical Stack
-Frontend
-HTML5
-CSS3 (gradients, animations, glassmorphism)
-JavaScript (ES6+)
-Leaflet.js
+
+• Frontend
+
+• HTML5
+
+• CSS3 (gradients, animations, glassmorphism)
+
+• JavaScript (ES6+)
+
+• Leaflet.js
 
 APIs
-OpenWeather Current Weather
-OpenWeather 5‑Day Forecast
-OpenWeather Radar Tile Layers
+• OpenWeather Current Weather
+
+• OpenWeather 5‑Day Forecast
+
+• OpenWeather Radar Tile Layers
 
 Cloud Deployment
-AWS S3 for static hosting
-AWS CloudFront for global CDN, HTTPS, and caching
+
+• AWS S3 for static hosting
+
+• AWS CloudFront for global CDN, HTTPS, and caching
 
 📁 Project Structure
 /
