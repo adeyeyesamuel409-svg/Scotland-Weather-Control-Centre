@@ -19,6 +19,7 @@ The Scotland Weather Control Center is designed to provide a clean, high‑contr
 I designed the dashboard to feel modern, responsive, and operationally useful. Every component is built to give a clear, real‑time picture of weather conditions across Scotland.
 
 3D Weather Core
+
 • Custom 3D‑styled Scotland visual
 
 • Animated orbit ring with glow effects
@@ -43,19 +44,19 @@ Live Radar Map (Leaflet + OpenWeather Tiles)
 
 City Selector
 
-Dropdown with major Scottish cities
+• Dropdown with major Scottish cities
 
-Instant refresh via Sync Now
+• Instant refresh via Sync Now
 
-Automatic map repositioning
+• Automatic map repositioning
 
 5‑Day Forecast
 
-Condensed forecast layout
+• Condensed forecast layout
 
-Midday selection for consistent readings
+• Midday selection for consistent readings
 
-Temperature and condition summaries
+• Temperature and condition summaries
 
 Atmospheric Profile
 Dew point (calculated)
