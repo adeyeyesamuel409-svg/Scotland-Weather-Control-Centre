@@ -59,13 +59,20 @@ City Selector
 • Temperature and condition summaries
 
 Atmospheric Profile
-Dew point (calculated)
-Cloud base height (calculated)
-Sea level pressure
-Ground level pressure
-Cloud cover percentage
-Human‑readable condition tags
-Last update timestamp
+
+• Dew point (calculated)
+
+• Cloud base height (calculated)
+
+• Sea level pressure
+
+• Ground level pressure
+
+• Cloud cover percentage
+
+• Human‑readable condition tags
+
+• Last update timestamp
 
 Branding
 “Built by Samuel • 2026” signature badge
