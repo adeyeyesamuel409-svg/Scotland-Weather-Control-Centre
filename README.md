@@ -1,11 +1,11 @@
   Scotland Weather Control Center — 3D Live Weather Dashboard
-https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white
-https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white
-https://img.shields.io/badge/JavaScript-323330?logo=javascript&logoColor=F7DF1E
-https://img.shields.io/badge/Leaflet.js-199900?logo=leaflet&logoColor=white
-https://img.shields.io/badge/OpenWeather_API-FF8C00?logo=cloud&logoColor=white
-https://img.shields.io/badge/AWS_S3-569A31?logo=amazonaws&logoColor=white
-https://img.shields.io/badge/AWS_CloudFront-FF9900?logo=amazonaws&logoColor=white
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-323330?logo=javascript&logoColor=F7DF1E)
+![Leaflet.js](https://img.shields.io/badge/Leaflet.js-199900?logo=leaflet&logoColor=white)
+![OpenWeather API](https://img.shields.io/badge/OpenWeather_API-FF8C00?logo=cloud&logoColor=white)
+![AWS S3](https://img.shields.io/badge/AWS_S3-569A31?logo=amazonaws&logoColor=white)
+![AWS CloudFront](https://img.shields.io/badge/AWS_CloudFront-FF9900?logo=amazonaws&logoColor=white)
 
 This project is a fully interactive, 3D‑styled weather intelligence dashboard I built for key Scottish cities. It brings together real‑time weather data, radar layers, atmospheric calculations, and a custom UI into a single cloud‑hosted application. Everything is powered by the OpenWeather API and deployed globally using AWS S3 and CloudFront for fast, reliable delivery.
 
