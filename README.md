@@ -157,7 +157,7 @@ Your dashboard is now live.
 
 📸 Screenshot
 
-![Scotland Weather Dashboard Screenshot](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/yourimage.png?raw=true)
+![Scotland Weather Dashboard Screenshot]
 
 
 
