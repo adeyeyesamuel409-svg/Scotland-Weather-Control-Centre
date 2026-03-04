@@ -19,10 +19,10 @@ The Scotland Weather Control Center is designed to provide a clean, high‑contr
 I designed the dashboard to feel modern, responsive, and operationally useful. Every component is built to give a clear, real‑time picture of weather conditions across Scotland.
 
 3D Weather Core
-.Custom 3D‑styled Scotland visual
-.Animated orbit ring with glow effects
-.Real‑time temperature, conditions, and descriptions
-.Feels‑like temperature, wind speed, humidity, and visibility
+*Custom 3D‑styled Scotland visual
+*Animated orbit ring with glow effects
+*Real‑time temperature, conditions, and descriptions
+*Feels‑like temperature, wind speed, humidity, and visibility
 
 Live Radar Map (Leaflet + OpenWeather Tiles)
 .Rain radar
