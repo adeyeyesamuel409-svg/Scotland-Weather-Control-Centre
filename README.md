@@ -158,9 +158,8 @@ Your dashboard is now live.
 📸 Screenshot
 
 <p align="center">
-  <img src="https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/adeyeyesamuel409-svg_Scotland-Weather-Control-Centre_%203D%20live%20weather%20dashboard%20using%20OpenWeather%20API,%20Leaflet,%20AWS%20S3%20+%20and%2010%20more%20pages%20-%20Personal%20-%20Microsoft%E2%80%8B%20Edge%203_3_2026%209_06_00%20PM.png?raw=true" width="900">
+  <img src="https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/dashboard.png?raw=true" width="900">
 </p>
-
 
 
 
