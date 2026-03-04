@@ -34,19 +34,28 @@ Rain radar
 Cloud coverage
 
 Wind patterns
+
 Temperature layers
+
 Layer toggles for quick switching
+
 Smooth zoom and pan interactions
 
 City Selector
-.Dropdown with major Scottish cities
-.Instant refresh via Sync Now
-.Automatic map repositioning
+
+Dropdown with major Scottish cities
+
+Instant refresh via Sync Now
+
+Automatic map repositioning
 
 5‑Day Forecast
-.Condensed forecast layout
-.Midday selection for consistent readings
-.Temperature and condition summaries
+
+Condensed forecast layout
+
+Midday selection for consistent readings
+
+Temperature and condition summaries
 
 Atmospheric Profile
 Dew point (calculated)
