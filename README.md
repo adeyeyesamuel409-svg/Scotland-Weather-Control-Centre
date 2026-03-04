@@ -16,6 +16,7 @@ https://dfatncdayllfx.cloudfront.net
 The Scotland Weather Control Center is designed to provide a clean, high‑contrast interface that makes live weather conditions easy to understand at a glance. It includes a 3D visual representation of Scotland, animated UI elements, and a layout focused on clarity and operational awareness. Users can switch between major Scottish cities and instantly view localized conditions, updated in real time through the OpenWeather API.
 
 ✨ Features
+
 I designed the dashboard to feel modern, responsive, and operationally useful. Every component is built to give a clear, real‑time picture of weather conditions across Scotland.
 
 3D Weather Core
