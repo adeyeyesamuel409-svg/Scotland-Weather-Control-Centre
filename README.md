@@ -20,8 +20,11 @@ I designed the dashboard to feel modern, responsive, and operationally useful. E
 
 3D Weather Core
 • Custom 3D‑styled Scotland visual
+
 • Animated orbit ring with glow effects
+
 • Real‑time temperature, conditions, and descriptions
+
 • Feels‑like temperature, wind speed, humidity, and visibility
 
 Live Radar Map (Leaflet + OpenWeather Tiles)
