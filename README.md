@@ -29,17 +29,17 @@ I designed the dashboard to feel modern, responsive, and operationally useful. E
 
 Live Radar Map (Leaflet + OpenWeather Tiles)
 
-Rain radar
+ • Rain radar
 
-Cloud coverage
+• Cloud coverage
 
-Wind patterns
+• Wind patterns
 
-Temperature layers
+• Temperature layers
 
-Layer toggles for quick switching
+• Layer toggles for quick switching
 
-Smooth zoom and pan interactions
+• Smooth zoom and pan interactions
 
 City Selector
 
