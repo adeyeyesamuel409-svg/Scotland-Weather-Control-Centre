@@ -155,9 +155,10 @@ In CloudFront → Invalidations:
 5. Open your CloudFront URL
 Your dashboard is now live.
 
-## 📸 Screenshot
-
+📸 Screenshot
 ![Scotland Weather Dashboard Screenshot](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/yourimage.png?raw=true)
+
+
 
 
 
