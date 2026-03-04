@@ -155,9 +155,11 @@ In CloudFront → Invalidations:
 5. Open your CloudFront URL
 Your dashboard is now live.
 
-📸 Screenshots
+## 📸 Screenshot
 
-![Scotland Weather Dashboard Screenshot](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/Scotland%203D%20Weather%20Control%20Center%20and%205%20more%20pages%20-%20Personal%20-%20Microsoft%E2%80%8B%20Edge%203_1_2026%2012_06_14%20PM.png?raw=true)
+![Scotland Weather Dashboard Screenshot](https://github.com/adeyeyesamuel409-svg/Scotland-Weather-Control-Centre/blob/main/yourimage.png?raw=true)
+
+
 
 - Built by Samuel badge
 
